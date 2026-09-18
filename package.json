@@ -1,0 +1,26 @@
+{
+  "name": "typer",
+  "description": "A typing speed typer speeder typing typer",
+  "author": "exerinity <me@exerinity.com>",
+  "repository": "github.com/exerinity/typer",
+  "license": "UNLICENSE",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "stage": "vite build && vite preview"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.70.3",
+    "svelte": "^5.57.0",
+    "vite": "^8.3.0"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.3.0",
+    "bootstrap": "^5.3.8"
+  }
+}
