@@ -16,6 +16,9 @@ button { cursor: pointer; }
 .intro { display: flex; align-items: end; justify-content: space-between; padding: 58px 0 42px; }
 h1 { margin: 0 0 8px; color: #fff; font-size: clamp(28px, 5vw, 42px); font-weight: 500; letter-spacing: -.04em; }
 .intro p { margin: 0; color: #fff; font-size: 12px; font-weight: 400; }
+.controls { display: flex; align-items: stretch; gap: 12px; }
+.animation_toggle { display: flex; align-items: center; gap: 7px; color: #fff; font-size: 12px; font-weight: 500; }
+.animation_toggle input { accent-color: #ff3b30; }
 .upload_control { display: flex; align-items: center; gap: 10px; padding: 10px 13px; border: 1px solid #555; color: #fff; cursor: pointer; font-size: 12px; font-weight: 500; }
 .upload_control:hover { border-color: #ff3b30; }
 .upload_control input { display: none; }
@@ -36,6 +39,9 @@ h1 { margin: 0 0 8px; color: #fff; font-size: clamp(28px, 5vw, 42px); font-weigh
 .panel_heading, .panel_footer { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; }
 .panel_heading { border-bottom: 1px solid #333; }
 .typing_wrap { position: relative; min-height: 230px; padding: 27px 20px; }
+.typing_wrap:focus-within { outline: 1px dotted #ff3b30; outline-offset: -1px; }
+.confetti_layer { position: absolute; inset: 0; z-index: 1; overflow: hidden; pointer-events: none; }
+.confetti { position: absolute; top: var(--y); left: var(--x); width: var(--size); height: calc(var(--size) * 1.8); background: var(--color); animation: confetti_burst var(--duration) cubic-bezier(.2,.7,.3,1) forwards; transform: rotate(var(--angle)); }
 .text_display { max-width: 100%; padding-right: 1ch; color: #555; font-size: 21px; font-weight: 400; line-height: 1.8; white-space: pre-wrap; overflow-wrap: break-word; word-break: normal; }
 .text_display span { position: relative; }
 .text_word { display: inline-block; white-space: nowrap; }
@@ -52,6 +58,8 @@ h1 { margin: 0 0 8px; color: #fff; font-size: clamp(28px, 5vw, 42px); font-weigh
 @media (max-width: 640px) {
   .intro { display: block; padding: 42px 0 30px; }
   .upload_control { width: 100%; margin-top: 25px; }
+  .controls { display: block; }
+  .animation_toggle { margin-bottom: 12px; }
   .stat { min-height: 94px; padding: 16px 12px; }
   .stat:nth-child(odd) { border-left: 0; padding-left: 0; }
   .stat:nth-child(n+3) { border-top: 1px solid #333; }
@@ -60,4 +68,13 @@ h1 { margin: 0 0 8px; color: #fff; font-size: clamp(28px, 5vw, 42px); font-weigh
   .typing_wrap { min-height: 280px; padding: 20px 14px; }
   .text_display { font-size: 18px; }
   .start_prompt { right: 14px; }
+}
+
+@keyframes confetti_burst {
+  from { opacity: 1; transform: translate(-50%, -50%) rotate(var(--angle)) scale(1); }
+  to { opacity: 0; transform: translate(calc(-50% + var(--x-offset)), calc(-50% + var(--y-offset))) rotate(calc(var(--angle) + 240deg)) scale(.4); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .confetti { animation: none; }
 }
