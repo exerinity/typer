@@ -1,0 +1,88 @@
+<script>
+  import { onDestroy } from 'svelte'
+  import stats_panel from '../stats_panel.svelte'
+  import upload_control from '../upload_control.svelte'
+  import typing_panel from '../typing_panel.svelte'
+  import { standard_deviation } from '../typing_utils.js'
+
+  const starter_text = `The story so far: In the beginning the Universe was created. This has made a lot of people very angry and been widely regarded as a bad move.`
+  let target_text = starter_text
+  let typed_text = ''
+  let started_at = 0
+  let elapsed = 0
+  /**
+     * @type {number | undefined}
+     */
+  let interval
+  let samples = []
+  let file_name = 'universe.txt'
+  let locked = false
+
+  $: correct_chars = [...typed_text].filter((char, index) => char === target_text[index]).length
+  $: accuracy = typed_text.length ? Math.round((correct_chars / typed_text.length) * 100) : 100
+  $: wpm = elapsed > 0 ? Math.round(correct_chars / 5 / (elapsed / 60000)) : 0
+  $: consistency = samples.length > 1 ? Math.max(0, Math.round(100 - standard_deviation(samples) * 2.5)) : 100
+  $: finished = typed_text.length >= target_text.length
+
+  function start_timer() {
+    if (started_at || locked) return
+    started_at = Date.now()
+    interval = setInterval(() => {
+      elapsed = Date.now() - started_at
+      if (elapsed > 0 && Math.floor(elapsed / 1000) % 2 === 0) samples = [...samples, wpm].slice(-30)
+    }, 100)
+  }
+
+  function stop_timer() {
+    clearInterval(interval)
+    elapsed = started_at ? Date.now() - started_at : 0
+  }
+
+  function handle_input(event) {
+    if (locked) return
+    typed_text = event.currentTarget.value
+    start_timer()
+    if (typed_text.length > target_text.length) typed_text = typed_text.slice(0, target_text.length)
+    if (typed_text.length >= target_text.length) {
+      locked = true
+      stop_timer()
+    }
+  }
+
+  function reset() {
+    stop_timer()
+    typed_text = ''
+    started_at = 0
+    elapsed = 0
+    samples = []
+    locked = false
+  }
+
+  function load_file(event) {
+    const file = event.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = () => {
+      target_text = String(reader.result || '').trim() || starter_text
+      file_name = file.name
+      reset()
+    }
+    reader.readAsText(file)
+  }
+
+  onDestroy(stop_timer)
+</script>
+
+<svelte:head>
+  <title>Typing test</title>
+</svelte:head>
+
+<main class="app_shell container py-5">
+  <section class="intro row align-items-end g-4">
+    <div><h1>Typing test</h1></div>
+    <svelte:component this={upload_control} file_name={file_name} on_load={load_file} />
+  </section>
+
+  <svelte:component this={stats_panel} {wpm} {accuracy} {consistency} {elapsed} {started_at} {finished} />
+  <svelte:component this={typing_panel} {target_text} {typed_text} {locked} {finished} {reset} {handle_input} />
+</main>
